@@ -15,11 +15,11 @@ module.exports = {
       },
       short_description: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       long_description: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       access_link: {
         type: Sequelize.STRING,

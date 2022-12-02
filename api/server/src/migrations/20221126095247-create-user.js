@@ -16,14 +16,14 @@ module.exports = {
         allowNull: false,
       },
       gender: {
-        type: Sequelize.ENUM('male', 'female'),
-        allowNull: false,
+        type: Sequelize.ENUM,
+        values: ['male','female'],
+        defaultValue:'male',
       },
       dob: {
         allowNull: true,
         type: Sequelize.DATE
       },
-
       otp_to_login: {
         allowNull: true,
         type: Sequelize.INTEGER
@@ -34,7 +34,7 @@ module.exports = {
       },
       avatar: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       firstname: {
         allowNull: true,
@@ -70,7 +70,7 @@ module.exports = {
       },
       bio: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       customized_link: {
         allowNull: true,
@@ -98,19 +98,21 @@ module.exports = {
       },
       cover_image: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       user_type: {
-        allowNull: true,
-        type: Sequelize.ENUM('client','coach','admin')
+        type: Sequelize.ENUM,
+        values: ['client','coach','admin'],
+        defaultValue:'client'
       },
       your_goal: {
         allowNull: true,
         type: Sequelize.STRING
       },
       current_fitness_level: {
-        allowNull: true,
-        type: Sequelize.ENUM('beginner','intermediate','advanced')
+        type: Sequelize.ENUM,
+        values: ['beginner','intermediate','advanced'],
+        defaultValue:'beginner'
       },
       latitude: {
         allowNull: true,
@@ -138,19 +140,19 @@ module.exports = {
       },
       experience: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       certifications: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       areas_of_interest: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       long_description: {
         allowNull: true,
-        type: Sequelize.BYTEA
+        type: Sequelize.BLOB
       },
       createdAt: {
         allowNull: false,
