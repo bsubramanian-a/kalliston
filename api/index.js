@@ -1,5 +1,7 @@
 import config from 'dotenv';
 import express from 'express';
+import { Sequelize } from 'sequelize';
+import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import userRoutes from '../api/server/routes/UserRoutes';
 
@@ -8,7 +10,8 @@ config.config();
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser);
 
 const port = process.env.PORT || 8000;
 

@@ -57,9 +57,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      tpye: {
-        type: Sequelize.ENUM('push', 'legs', 'upper', 'lower', 'pull_and_abs', 'back_and_biceps', 'shoulder_and_arms', 'cardio'),
-        allowNull: false,
+      type: {
+        type: Sequelize.ENUM,
+        values: ['push', 'legs', 'upper', 'lower', 'pull_and_abs', 'back_and_biceps', 'shoulder_and_arms', 'cardio'],
+        defaultValue:'push'
       },
       createdAt: {
         allowNull: false,

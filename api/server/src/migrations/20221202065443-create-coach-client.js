@@ -22,8 +22,9 @@ module.exports = {
         allowNull:false
       },
       status: {
-        type: Sequelize.ENUM('approve','reject'),
-        allowNull:false
+        type: Sequelize.ENUM,
+        values: ['approve','reject'],
+        defaultValue:'reject'
       },
       createdAt: {
         allowNull: false,

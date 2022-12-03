@@ -34,8 +34,9 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('client', 'coach', 'admin'),
-        allowNull: false,
+        type: Sequelize.ENUM,
+        values: ['client', 'coach', 'admin'],
+        defaultValue:'client'
       },
       createdAt: {
         allowNull: false,

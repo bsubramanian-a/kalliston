@@ -10,8 +10,9 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       term: {
-        type: Sequelize.ENUM('monthly', 'yearly'),
-        allowNull: false,
+        type: Sequelize.ENUM,
+        values: ['monthly', 'yearly'],
+        defaultValue:'monthly'
       },
       price: {
         type: Sequelize.REAL,
