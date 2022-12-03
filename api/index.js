@@ -1,6 +1,5 @@
 import config from 'dotenv';
 import express from 'express';
-import { Sequelize } from 'sequelize';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import userRoutes from '../api/server/routes/UserRoutes';
