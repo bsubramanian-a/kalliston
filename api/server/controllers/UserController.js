@@ -1,9 +1,42 @@
 import UserService from "../services/UserService";
-import Util from '../utils/Utils'
+import Util from '../utils/Utils';
+import bcrypt from 'bcrypt';
+import user from "../src/models/user";
 
-const util = new Util();
+import jwt from 'jsonwebtoken'
 
-const signup = async (req, res) => {
+//const util = new Util();
+
+const createCoach = async (req, res) => {
+  return res.json(200).send("coach check2")
+  try {
+    const { email } = req.body;
+
+    const data = {
+      email,
+      password: await bcrypt.hash(Math.random().toString(36).slice(2,7)),
+      user_type: 'coach'
+    }
+
+    const newCoach = await user.create(data);
+    if (newCoach) {
+      let token = jwt.sign({id: newCoach.id}, process.env.SECRET_KEY, {
+        expiresIn: 1 * 24 * 60 * 60 * 1000,
+      });
+      res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
+      console.log("newCoach", JSON.stringify(newCoach, null, 2));
+      console.log(token);
+      //send newCoach details
+      return res.status(201).send(newCoach);
+    } else {
+      return res.status(409).send("Details are not correct");
+    }
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+const coachLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
   } catch (error) {
@@ -11,7 +44,7 @@ const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+const forget = async (req, res) => {
   try {
     const { email, password } = req.body;
   } catch (error) {
@@ -19,11 +52,16 @@ const login = async (req, res) => {
   }
 };
 
-export { signup, login };
+const updateProfile = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+  } catch (error) {
+    console.log(error)
+  }
+};
 
+export { createCoach, coachLogin, forget, updateProfile };
 
-
-export default login;
 
 
 // class UserController {
