@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCoach, coachLogin, coachForget, updateProfile, getAllUsers, checkOTP, checkOTPForget } from '../controllers/UserController';
+import { createCoach, coachLogin, coachForget, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword } from '../controllers/UserController';
 import { checkCoachAlreadyExist } from '../middleware/userAuth';
 
 const router = Router();
@@ -16,6 +16,7 @@ router.post('/coach-login',coachLogin);
 router.post('/coach-otp',checkOTP);
 router.post('/coach-forget',coachForget);
 router.post('/coach-otp-forget',checkOTPForget);
-router.put('/updateProfile',updateProfile);
+router.post('/coach-change-password',coachChangePassword)
+router.put('/coach-update-profile',coachUpdateProfile);
 
 export default router;

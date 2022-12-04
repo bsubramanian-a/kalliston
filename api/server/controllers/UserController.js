@@ -255,7 +255,7 @@ const coachChangePassword = async (req, res) => {
   }
 }
 
-const updateProfile = async (req, res) => {
+const coachUpdateProfile = async (req, res) => {
   try {
     const { email, password } = req.body;
     const coach = await database.User.findOne({where: {email}});
@@ -284,7 +284,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-export { createCoach, coachLogin, coachForget, updateProfile, getAllUsers, checkOTP, checkOTPForget };
+export { createCoach, coachLogin, coachForget, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
 
 
 
