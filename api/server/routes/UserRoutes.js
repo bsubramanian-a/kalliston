@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCoach, coachLogin, forget, updateProfile } from '../controllers/UserController';
+import { createCoach, coachLogin, forget, updateProfile, getAllUsers } from '../controllers/UserController';
 import { checkCoachAlreadyExist } from '../middleware/userAuth';
 
 const router = Router();
@@ -10,6 +10,7 @@ const router = Router();
 // router.put('/:id', UserController.updatedUser);
 // router.delete('/:id', UserController.deleteUser);
 
+router.get('/',getAllUsers);
 router.post('/create-coach',[checkCoachAlreadyExist],createCoach);
 router.post('/coach-login',coachLogin);
 router.post('/forget',forget);

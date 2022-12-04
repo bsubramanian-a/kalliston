@@ -1,24 +1,34 @@
 import UserService from "../services/UserService";
 import Util from '../utils/Utils';
 import bcrypt from 'bcrypt';
-import user from "../src/models/user";
-
+import database from '../src/models';
+import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken'
 
-//const util = new Util();
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'crtvecode@gmail.com',
+    pass: 'sbyvkjdckqtosuhm'
+  }
+});
+
+
+
+const util = new Util();
 
 const createCoach = async (req, res) => {
-  return res.json(200).send("coach check2")
   try {
     const { email } = req.body;
+    const passwordTOSend = Math.random().toString(36).slice(2,7);
 
     const data = {
       email,
-      password: await bcrypt.hash(Math.random().toString(36).slice(2,7)),
+      password: await bcrypt.hashSync(passwordTOSend, 10),
       user_type: 'coach'
     }
 
-    const newCoach = await user.create(data);
+    const newCoach = await database.User.create(data);
     if (newCoach) {
       let token = jwt.sign({id: newCoach.id}, process.env.SECRET_KEY, {
         expiresIn: 1 * 24 * 60 * 60 * 1000,
@@ -26,6 +36,23 @@ const createCoach = async (req, res) => {
       res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
       console.log("newCoach", JSON.stringify(newCoach, null, 2));
       console.log(token);
+
+      const mailOptions = {
+        from: 'crtvecode@gmail.com',
+        to: email,
+        subject: 'Login Credentials',
+        text: `Email : ${email}, Password : ${passwordTOSend}`
+      };
+
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+          // do something useful
+        }
+      });
+
       //send newCoach details
       return res.status(201).send(newCoach);
     } else {
@@ -60,7 +87,22 @@ const updateProfile = async (req, res) => {
   }
 };
 
-export { createCoach, coachLogin, forget, updateProfile };
+const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await UserService.getAllUsers();
+    if (allUsers.length > 0) {
+      util.setSuccess(200, 'Users retrieved', allUsers);
+    } else {
+      util.setSuccess(200, 'No user found');
+    }
+    return util.send(res);
+  } catch (error) {
+    util.setError(400, error);
+    return util.send(res);
+  }
+}
+
+export { createCoach, coachLogin, forget, updateProfile, getAllUsers };
 
 
 
