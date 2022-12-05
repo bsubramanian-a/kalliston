@@ -279,10 +279,54 @@ const coachChangePassword = async (req, res) => {
 
 const coachUpdateProfile = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const coach = await database.User.findOne({where: {email}});
+    const { id } = req.params;
+    console.log("id",id);
+    const { 
+      email, 
+      gender, 
+      dob, 
+      avatar, 
+      firstname, 
+      lastname, 
+      email_notification,
+      client_request_notification,
+      message_from_client,
+      two_factor_auth,
+      sync_google,cal,
+      bio,
+      customized_link,
+      website_link,
+      instagram_link,
+      facebook_link,
+      tiktok_link,
+      youtube_link,
+      cover_image,
+      user_type,
+      your_goal,
+      current_fitness_level,
+      latitude,
+      longitude,
+      billing_address1,
+      billing_address2,
+      city,
+      country,
+      experience,
+      certifications,
+      areas_of_interest,
+      long_description,
+      createdAt,
+      updatedAt  
+    } = req.body;
+    const coach = await database.User.findOne({where: {id}});
+    console.log(coach);
     if (coach) {
-      
+      const update_profile = await database.User.update(
+        {gender},
+        {where:{id:coach.id}}
+      );
+      if (update_profile) {
+        return res.status(200).send("profile updated")
+      }
     } else {
       return res.status(401).send("Email does not exist.");
     }

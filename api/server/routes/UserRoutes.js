@@ -18,6 +18,6 @@ router.post('/coach-otp',checkOTP);
 router.post('/coach-forget',coachForgetPassword);
 router.post('/coach-otp-forget',checkOTPForget);
 router.post('/coach-change-password',[verifyToken],coachChangePassword)
-// router.put('/coach-update-profile',coachUpdateProfile);
+router.put('/coach-update-profile/:id',[verifyToken],coachUpdateProfile);
 
 export default router;
