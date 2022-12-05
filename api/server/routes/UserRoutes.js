@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { createCoach, coachLogin, coachForget, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword } from '../controllers/UserController';
-import { checkCoachAlreadyExist } from '../middleware/userAuth';
+import { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword} from '../controllers/UserController';
+import { checkCoachAlreadyExist } from '../middleware/UserAuth';
+import { verifyToken } from '../middleware/AuthJWT'
 
 const router = Router();
 
@@ -14,9 +15,9 @@ router.get('/',getAllUsers);
 router.post('/create-coach',[checkCoachAlreadyExist],createCoach);
 router.post('/coach-login',coachLogin);
 router.post('/coach-otp',checkOTP);
-router.post('/coach-forget',coachForget);
+router.post('/coach-forget',coachForgetPassword);
 router.post('/coach-otp-forget',checkOTPForget);
-router.post('/coach-change-password',coachChangePassword)
-router.put('/coach-update-profile',coachUpdateProfile);
+router.post('/coach-change-password',[verifyToken],coachChangePassword)
+// router.put('/coach-update-profile',coachUpdateProfile);
 
 export default router;

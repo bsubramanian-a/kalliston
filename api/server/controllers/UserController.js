@@ -123,38 +123,11 @@ const coachLogin = async (req, res) => {
     console.log(error)
   }
 };
-
-const checkOTP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    const coach = await database.User.findOne({where: {email}});
-    if (coach) {
-      if (otp == coach.otp_to_login) {
-        const update_otp = await database.User.update(
-          {otp_to_login: ""},
-          {where:{id:coach.id}}
-        );
-        if (update_otp) {
-          return res.status(200).send("success");
-        } else {
-          return res.status(401).send("Login OTP error.");
-        }
-      } else {
-        return res.status(401).send("Login OTP is not valid.");
-      }
-    } else {
-      return res.status(401).send("Email does not exist.");
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(401).send("some error");
-  }
-}
-
-const coachForget = async (req, res) => {
+const coachForgetPassword = async (req, res) => {  
   try {
     const { email } = req.body;
     const coach = await database.User.findOne({where: {email}});
+    console.log("coach", coach);
     if (coach) {
       const otp_to_forget = Math.floor(100000 + Math.random() * 900000);
         
@@ -176,7 +149,7 @@ const coachForget = async (req, res) => {
               console.log(error);
             } else {
               console.log('Email sent: ' + info.response);
-              return res.status(201).send(token);
+              return res.status(201).send("success");
               // do something useful
             }
           });
@@ -189,7 +162,34 @@ const coachForget = async (req, res) => {
   } catch (error) {
     console.log(error)
   }
-};
+}
+
+const checkOTP = async (req, res) => {  
+  try {
+    const { email, otp } = req.body;
+    const coach = await database.User.findOne({where: {email}});
+    if (coach) {
+      if (otp == coach.otp_to_login) {
+        const update_otp = await database.User.update(
+          {otp_to_login: null},
+          {where:{id:coach.id}}
+        );
+        if (update_otp) {
+          return res.status(200).send("success");
+        } else {
+          return res.status(401).send("Login OTP error.");
+        }
+      } else {
+        return res.status(401).send("Login OTP is not valid.");
+      }
+    } else {
+      return res.status(401).send("Email does not exist.");
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(401).send("some error");
+  }
+}
 
 const checkOTPForget = async (req, res) => {
   try {
@@ -198,7 +198,7 @@ const checkOTPForget = async (req, res) => {
     if (coach) {
       if (otp == coach.otp_to_forget) {
         const update_otp_forget = await database.User.update(
-          {otp_to_forget: ""},
+          {otp_to_forget: null},
           {where:{id:coach.id}}
         );
         if (update_otp_forget) {
@@ -246,7 +246,29 @@ const coachChangePassword = async (req, res) => {
     const { email, password } = req.body;
     const coach = await database.User.findOne({where: {email}});
     if (coach) {
-
+      const password_update = await database.User.update(
+        {password: await bcrypt.hashSync(password, 10)},
+        {where:{id:coach.id}}
+      );
+      if (password_update) {
+        const mailOptions = {
+          from: 'crtvecode@gmail.com',
+          to: email,
+          subject: 'Your New Password Updated Successfully',
+          text: `Password : ${password}`
+        };
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+            return res.status(200).send("success");
+            // do something useful
+          }
+        });
+      } else {
+        return res.status(401).send("New Password update error.");  
+      }
     } else {
       return res.status(401).send("Email does not exist.");
     }
@@ -284,7 +306,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-export { createCoach, coachLogin, coachForget, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
+export { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
 
 
 
