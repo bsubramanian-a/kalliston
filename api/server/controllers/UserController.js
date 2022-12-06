@@ -47,42 +47,32 @@ const createCoach = async (req, res) => {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
-          // do something useful
+          return res.status(201).send({
+            status: "success" 
+          });
         }
       });
-
-      //send newCoach details
-      return res.status(201).send(newCoach);
     } else {
-      return res.status(409).send("Details are not correct");
+      return res.status(409).send({
+        status: "error" 
+      });
     }
   } catch (error) {
-    console.log(error)
+    //console.log(error)
+    return res.status(409).send({
+      status: "error" 
+    });
   }
 };
 
 const coachLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("received email",email);
     const coach = await database.User.findOne({where: {email}});
-    console.log("received email",coach.email);
 
     if (coach) {
-      console.log("=========");
-      console.log("password",password);
-      console.log("coach hash", coach.password);
-      const isPasswordSame = await bcrypt.compareSync(password, coach.password);
-      console.log("coach",coach.email);
-      console.log("isPasswordSame",isPasswordSame);
-      console.log("=========");
-      if (isPasswordSame) {
-        let token = jwt.sign({ id: coach.id }, process.env.SECRET_KEY, {
-          expiresIn: 1 * 24 * 60 * 60 * 1000,
-        });
-        res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
-        console.log("user", JSON.stringify(coach, null, 2));
-        console.log(token);
+      const isPasswordSame = await bcrypt.compareSync(password, coach.password);      
+      if (isPasswordSame) {        
 
         //generate otp
         const otp_to_login = Math.floor(100000 + Math.random() * 900000);
@@ -105,22 +95,34 @@ const coachLogin = async (req, res) => {
               console.log(error);
             } else {
               console.log('Email sent: ' + info.response);
-              return res.status(201).send(token);
+              return res.status(201).send({
+                status: "success" 
+              });
+              //return res.status(201).send(token);
               // do something useful
             }
           });
         } else {
-          return res.status(401).send("OTP error");
+          return res.status(401).send({
+            status: "OTP error" 
+          });
         }
       } else {
-        return res.status(401).send("Password not correct");
+        return res.status(401).send({
+          status: "Password not correct" 
+        });
       }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        status: "Email does not exist." 
+      });
     }
 
   } catch (error) {
     console.log(error)
+    return res.status(401).send({
+      status: "error" 
+    });
   }
 };
 const coachForgetPassword = async (req, res) => {  
@@ -170,24 +172,45 @@ const checkOTP = async (req, res) => {
     const coach = await database.User.findOne({where: {email}});
     if (coach) {
       if (otp == coach.otp_to_login) {
+
+        let token = jwt.sign({ id: coach.id }, process.env.SECRET_KEY, {
+          expiresIn: 1 * 24 * 60 * 60 * 1000,
+        });
+        res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
+        console.log("user", JSON.stringify(coach, null, 2));
+        console.log(token);
+
         const update_otp = await database.User.update(
           {otp_to_login: null},
           {where:{id:coach.id}}
         );
         if (update_otp) {
-          return res.status(200).send("success");
+          return res.status(201).send({
+            status: "success",
+            coach,
+            token 
+          });
+          //return res.status(200).send("success");
         } else {
-          return res.status(401).send("Login OTP error.");
+          return res.status(401).send({
+            status: "Login OTP error." 
+          });
         }
       } else {
-        return res.status(401).send("Login OTP is not valid.");
+        return res.status(401).send({
+          status: "Login OTP is not valid." 
+        });
       }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        status: "Email does not exist." 
+      });
     }
   } catch (error) {
     console.log(error);
-    return res.status(401).send("some error");
+    return res.status(401).send({
+      status: "some error" 
+    });
   }
 }
 
