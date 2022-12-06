@@ -151,18 +151,27 @@ const coachForgetPassword = async (req, res) => {
               console.log(error);
             } else {
               console.log('Email sent: ' + info.response);
-              return res.status(201).send("success");
+              return res.status(201).send({
+                status: "success" 
+              });
               // do something useful
             }
           });
         } else {
-          return res.status(401).send("OTP error");
+          return res.status(401).send({
+            status: "OTP error" 
+          });
         }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        status: "Email does not exist." 
+      });
     }
   } catch (error) {
     console.log(error)
+    return res.status(401).send({
+      status: "error" 
+    });
   }
 }
 
