@@ -275,37 +275,54 @@ const checkOTPForget = async (req, res) => {
 
 const coachChangePassword = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, currentpassword,newpassword } = req.body;
     const coach = await database.User.findOne({where: {email}});
     if (coach) {
-      const password_update = await database.User.update(
-        {password: await bcrypt.hashSync(password, 10)},
-        {where:{id:coach.id}}
-      );
-      if (password_update) {
-        const mailOptions = {
-          from: 'crtvecode@gmail.com',
-          to: email,
-          subject: 'Your New Password Updated Successfully',
-          text: `Password : ${password}`
-        };
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-            return res.status(200).send("success");
-            // do something useful
-          }
-        });
+      console.log("oldpassword",currentpassword);
+      console.log("coach.password",coach.password);
+      const isPasswordSame = await bcrypt.compareSync(currentpassword, coach.password);      
+      if (isPasswordSame) {
+        const password_update = await database.User.update(
+          {password: await bcrypt.hashSync(newpassword, 10)},
+          {where:{id:coach.id}}
+        );
+        if (password_update) {
+          const mailOptions = {
+            from: 'crtvecode@gmail.com',
+            to: email,
+            subject: 'Your New Password Updated Successfully',
+            text: `Your new Password : ${newpassword}`
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+              return res.status(200).send({
+                status: "success" 
+              });
+            }
+          });
+        } else {
+          return res.status(401).send({
+            status: "New Password update error." 
+          }); 
+        }
       } else {
-        return res.status(401).send("New Password update error.");  
+        return res.status(401).send({
+          status: "Old password is not correct." 
+        }); 
       }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        status: "Email does not exist." 
+      });
     }
   } catch (error) {
     console.log(error)
+    return res.status(401).send({
+      status: "error" 
+    });
   }
 }
 
