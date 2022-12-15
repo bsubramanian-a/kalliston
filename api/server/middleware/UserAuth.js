@@ -1,5 +1,5 @@
-import express from "express";
-import database from '../src/models';
+const express = require("express");
+const database = require('../src/models');
 //import { User } from "../src/models/user";
 
 const checkCoachAlreadyExist = async (req, res, next) => {
@@ -20,4 +20,4 @@ const checkCoachAlreadyExist = async (req, res, next) => {
   }
 };
 
-export { checkCoachAlreadyExist };
+module.exports =  { checkCoachAlreadyExist };

@@ -1,9 +1,9 @@
-import UserService from "../services/UserService";
-import Util from '../utils/Utils';
-import bcrypt from 'bcrypt';
-import database from '../src/models';
-import nodemailer from 'nodemailer';
-import jwt from 'jsonwebtoken'
+const UserService = require("../services/UserService");
+const Util = require('../utils/Utils');
+const bcrypt = require('bcrypt');
+const database = require('../src/models');
+const nodemailer = require("nodemailer");
+const jwt = require('jsonwebtoken');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -399,7 +399,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-export { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
+module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
 
 
 

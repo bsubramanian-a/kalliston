@@ -1,6 +1,6 @@
-import express from "express";
-import database from '../src/models';
-import jwt from 'jsonwebtoken'
+const express = require("express");
+const database = require('../src/models');
+const jwt = require('jsonwebtoken');
 
 const verifyToken = async (req, res, next) => {
     console.log("Authorization : ",req.headers.authorization);
@@ -24,4 +24,4 @@ const verifyToken = async (req, res, next) => {
     });
 };
 
-export { verifyToken };
+module.exports = { verifyToken };

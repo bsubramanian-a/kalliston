@@ -1,4 +1,4 @@
-import database from '../src/models'
+const database = require('../src/models');
 
 class UserService {
     static async getAllUsers() {
@@ -63,4 +63,4 @@ class UserService {
     }
   }
   
-  export default UserService;
+  module.exports = UserService;
