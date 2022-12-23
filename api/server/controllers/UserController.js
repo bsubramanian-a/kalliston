@@ -251,25 +251,36 @@ const checkOTPForget = async (req, res) => {
                 console.log(error);
               } else {
                 console.log('Email sent: ' + info.response);
-                return res.status(200).send("success");
-                // do something useful
+                return res.status(200).send({
+                  status: "success" 
+                });
               }
             });
           } else {
-            return res.status(401).send("Password update error.");  
+            return res.status(401).send({
+              status: "Password update error." 
+            });
           }
         } else {
-          return res.status(401).send("Forget OTP error.");
+          return res.status(401).send({
+            status: "Forget OTP error." 
+          });
         }
       } else {
-        return res.status(401).send("Forget OTP is not valid.");
+        return res.status(401).send({
+          status: "Forget OTP is not valid." 
+        });
       }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        status: "Email does not exist." 
+      });
     }
   } catch (error) {
     console.log(error);
-    return res.status(401).send("some error");
+    return res.status(401).send({
+      status: "some error" 
+    });
   }
 }
 
@@ -326,22 +337,72 @@ const coachChangePassword = async (req, res) => {
   }
 }
 
+const coachUpdateProfilePic = async(req, res) => {
+  console.log("coachUpdateProfilePic", req.file.filename);
+  try {
+    const id  = req.coachId;
+    const coach = await database.User.findOne({where: {id}});
+    if(coach){
+      if(req.file){
+        const update_profile = await database.User.update(
+          {avatar : req.file.filename},
+          {where: {id}}
+        );
+        if (update_profile) {
+          const coach = await database.User.findOne({where: {id}});
+          const url = req.get('host');
+          console.log("url",url);
+          coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+          return res.status(200).send({
+            message: "Profile picture updated successfully",
+            coach: coach,
+            status: 200
+          });
+        }else{
+          return res.status(401).send({
+            message: "Something went wrong, please try again later",
+            status: 401
+          });
+        }
+       
+      }else{
+        return res.status(401).send({
+          message: "something went wrong, please try again later",
+          status: 401
+        });
+      }
+    }else {
+      return res.status(401).send({
+        message: "User does not exist.",
+        status: 401
+      });
+    }
+    
+  } catch (error) {
+    console.log(error)
+    return res.status(401).send({
+      status: 401,
+      message: error
+    });
+  }
+}
+
 const coachUpdateProfile = async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log("id",id);
+    const id  = req.coachId;
+
     const { 
       email, 
       gender, 
-      dob, 
-      avatar, 
+      dob,  
       firstname, 
       lastname, 
       email_notification,
       client_request_notification,
       message_from_client,
       two_factor_auth,
-      sync_google,cal,
+      sync_google,
+      cal,
       bio,
       customized_link,
       website_link,
@@ -363,24 +424,68 @@ const coachUpdateProfile = async (req, res) => {
       certifications,
       areas_of_interest,
       long_description,
-      createdAt,
-      updatedAt  
     } = req.body;
     const coach = await database.User.findOne({where: {id}});
-    console.log(coach);
+
     if (coach) {
       const update_profile = await database.User.update(
-        {gender},
+        { email : email ?? undefined, 
+          gender : gender ?? undefined, 
+          dob : dob ?? undefined,
+          firstname : firstname ?? undefined, 
+          lastname : lastname ?? undefined, 
+          email_notification : email_notification ?? undefined,
+          client_request_notification : client_request_notification ?? undefined,
+          message_from_client : message_from_client ?? undefined,
+          two_factor_auth : two_factor_auth ?? undefined,
+          sync_google : sync_google ?? undefined,
+          cal : cal ?? undefined,
+          bio : bio ?? undefined,
+          customized_link : customized_link ?? undefined,
+          website_link : website_link ?? undefined,
+          instagram_link : instagram_link ?? undefined,
+          facebook_link : facebook_link ?? undefined,
+          tiktok_link : tiktok_link ?? undefined,
+          youtube_link : youtube_link ?? undefined,
+          cover_image : cover_image ?? undefined,
+          user_type : user_type ?? undefined,
+          your_goal : your_goal ?? undefined,
+          current_fitness_level : current_fitness_level ?? undefined,
+          latitude : latitude ?? undefined,
+          longitude : longitude ?? undefined,
+          billing_address1 : billing_address1 ?? undefined,
+          billing_address2 : billing_address2 ?? undefined,
+          city : city ?? undefined,
+          country : country ?? undefined,
+          experience : experience ?? undefined,
+          certifications : certifications ?? undefined,
+          areas_of_interest : areas_of_interest ?? undefined,
+          long_description : long_description ?? undefined
+        },
         {where:{id:coach.id}}
       );
+      console.log("update_profile",update_profile)
       if (update_profile) {
-        return res.status(200).send("profile updated")
+        const coach = await database.User.findOne({where: {id}});
+
+        return res.status(200).send({
+          message: "profile updated",
+          coach,
+          status: 200
+        });
       }
     } else {
-      return res.status(401).send("Email does not exist.");
+      return res.status(401).send({
+        message: "Email does not exist.",
+        status: 401
+      });
     }
   } catch (error) {
-    console.log(error)
+    console.log("Error", error);
+    return res.status(401).send({
+      message: error,
+      status: 401
+    });
   }
 };
 
@@ -399,7 +504,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword };
+module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic };
 
 
 

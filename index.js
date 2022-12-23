@@ -5,6 +5,8 @@ var bodyParser = require('body-parser')
 const userRoutes = require("./api/server/routes/UserRoutes");
 
 const app = express();
+var publicDir = require('path').join(__dirname,'/public'); 
+app.use(express.static(publicDir)); 
 
 app.use(cors({
     origin: '*'

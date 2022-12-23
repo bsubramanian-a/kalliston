@@ -20,6 +20,7 @@ const verifyToken = async (req, res, next) => {
             });
         }
         req.coachId = decoded.id;
+        console.log("decoded id", req.coachId);
         next();
     });
 };
