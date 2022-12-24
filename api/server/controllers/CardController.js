@@ -20,9 +20,9 @@ const getCardDetails = async (req, res) => {
 
     const card = await database.CardDetail.findOne({ where: { coach_id: id } });
     console.log("card details", card)
-    return res.status(401).send({
+    return res.status(200).send({
       card: card,
-      status: 401
+      status: 200
     });
   } catch (error) {
     return res.status(401).send({

@@ -195,7 +195,7 @@ const checkOTP = async (req, res) => {
         );
         if (update_otp) {
           const url = req.get('host');
-          coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+          if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
           return res.status(201).send({
             status: "success",
             coach,
@@ -359,7 +359,7 @@ const coachUpdateProfilePic = async(req, res) => {
           const coach = await database.User.findOne({where: {id}});
           const url = req.get('host');
           console.log("url",url);
-          coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+          if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
           return res.status(200).send({
             message: "Profile picture updated successfully",
             coach: coach,
@@ -477,7 +477,7 @@ const coachUpdateProfile = async (req, res) => {
       if (update_profile) {
         const coach = await database.User.findOne({where: {id}});
         const url = req.get('host');
-        coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+        if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
         return res.status(200).send({
           message: "profile updated",
           coach,
