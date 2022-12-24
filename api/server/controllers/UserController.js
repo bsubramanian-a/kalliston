@@ -312,29 +312,34 @@ const coachChangePassword = async (req, res) => {
             } else {
               console.log('Email sent: ' + info.response);
               return res.status(200).send({
-                status: "success" 
+                message: "success",
+                status: 200 
               });
             }
           });
         } else {
           return res.status(401).send({
-            status: "New Password update error." 
+            message: "New Password update error.",
+            status: 401
           }); 
         }
       } else {
         return res.status(401).send({
-          status: "Old password is not correct." 
+          status: 401,
+          message: "Old password is not correct." 
         }); 
       }
     } else {
       return res.status(401).send({
-        status: "Email does not exist." 
+        status: 401,
+        message: "Email does not exist." 
       });
     }
   } catch (error) {
     console.log(error)
     return res.status(401).send({
-      status: "error" 
+      status: 401,
+      message: "error" 
     });
   }
 }
