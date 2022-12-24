@@ -33,17 +33,18 @@ const getCardDetails = async (req, res) => {
 }
 
 const addCard = async (req, res) => {
-  const { coachId, card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country } = req.body;
+  const { card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country } = req.body;
   try {
-    const card = await database.CardDetail.findOne({ where: { coach_id: coachId } });
+    const id  = req.coachId;
+    const card = await database.CardDetail.findOne({ where: { coach_id: id } });
     console.log("card", card);
 
     if (card) {
       console.log("update")
       const data = {
-        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: coachId
+        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: id
       }
-      const update_profile = await database.CardDetail.update(data, { where: { coach_id: coachId } });
+      const update_profile = await database.CardDetail.update(data, { where: { coach_id: id } });
       if (update_profile) {
         return res.status(200).send({
           message: 'Card updated successfully',
@@ -58,7 +59,7 @@ const addCard = async (req, res) => {
     } else {
       console.log("create")
       const data = {
-        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: coachId
+        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: id
       }
       const createcard = await database.CardDetail.create(data);
       console.log("after update");
