@@ -312,7 +312,7 @@ const coachChangePassword = async (req, res) => {
             } else {
               console.log('Email sent: ' + info.response);
               return res.status(200).send({
-                message: "success",
+                message: "Password changed successfully",
                 status: 200 
               });
             }
