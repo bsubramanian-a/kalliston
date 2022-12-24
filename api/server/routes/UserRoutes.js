@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require('multer');
-const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic} = require('../controllers/UserController');
+const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic } = require('../controllers/UserController');
 const { checkCoachAlreadyExist } = require('../middleware/UserAuth');
 const { verifyToken } = require('../middleware/AuthJWT');
 

@@ -194,6 +194,8 @@ const checkOTP = async (req, res) => {
           {where:{id:coach.id}}
         );
         if (update_otp) {
+          const url = req.get('host');
+          coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
           return res.status(201).send({
             status: "success",
             coach,
@@ -424,6 +426,7 @@ const coachUpdateProfile = async (req, res) => {
       certifications,
       areas_of_interest,
       long_description,
+      otp_required
     } = req.body;
     const coach = await database.User.findOne({where: {id}});
 
@@ -441,6 +444,7 @@ const coachUpdateProfile = async (req, res) => {
           sync_google : sync_google ?? undefined,
           cal : cal ?? undefined,
           bio : bio ?? undefined,
+          otp_required: otp_required ?? undefined,
           customized_link : customized_link ?? undefined,
           website_link : website_link ?? undefined,
           instagram_link : instagram_link ?? undefined,
@@ -467,7 +471,8 @@ const coachUpdateProfile = async (req, res) => {
       console.log("update_profile",update_profile)
       if (update_profile) {
         const coach = await database.User.findOne({where: {id}});
-
+        const url = req.get('host');
+        coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
         return res.status(200).send({
           message: "profile updated",
           coach,

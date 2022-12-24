@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require('cors');
 var bodyParser = require('body-parser')
 const userRoutes = require("./api/server/routes/UserRoutes");
+const cardRoutes = require("./api/server/routes/CardRoutes");
 
 const app = express();
 var publicDir = require('path').join(__dirname,'/public'); 
@@ -17,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const port = process.env.PORT || 8000;
 
 app.use('/api/v1/users',userRoutes);
+app.use('/api/v1/cards',cardRoutes);
 
 // when a random route is inputed
 app.get('*', (req, res) => res.status(200).send({

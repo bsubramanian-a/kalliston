@@ -130,6 +130,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
+      pin: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
       city: {
         allowNull: true,
         type: Sequelize.STRING

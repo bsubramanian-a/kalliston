@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     avatar: {
       allowNull: true,
-      type: DataTypes.BLOB
+      type: DataTypes.STRING
     },
     firstname: {
       allowNull: true,
@@ -130,6 +130,10 @@ module.exports = (sequelize, DataTypes) => {
     country: {
       allowNull: true,
       type: DataTypes.STRING
+    },
+    pin: {
+      allowNull: true,
+      type: DataTypes.INTEGER
     },
     experience: {
       allowNull: true,
