@@ -15,84 +15,72 @@ const transporter = nodemailer.createTransport({
 const util = new Util();
 
 const getCardDetails = async (req, res) => {
-    try {
-      const id  = req.coachId;
-  
-      const card = await database.CardDetail.findOne({where: {user_id: id}});
-      console.log("card details", card)
-      return res.status(401).send({
-        card: card,
-        status: 401
-      });
-    } catch (error) {
-      return res.status(401).send({
-        message: error,
-        status: 401
-      });
-    }
-  }
-  
-  const addCard = async (req, res) => {
-    try {
-      const id  = req.coachId;
-  
-      const card = await database.CardDetail.findOne({where: {user_id: id}});
-      console.log("card", card);
-  
-      if(card){
-        const update_profile = await database.CardDetail.update(
-          { 
-            card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country
-        }, {where:{id: id}});
-  
-        if(update_profile){
-          return res.status(200).send({
-            card: card,
-            message: 'Card updated successfully',
-            status: 200
-          });
-        }else{
-          return res.status(401).send({
-            message: 'Something went wrong, please try again later',
-            status: 401
-          });
-        }
-      }else{
-        console.log("create")
-        const data = {
-          card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, user_id: id
-        }
-        try {
-          return await database.CardDetail.create(data);
-        } catch (error) {
-          throw error;
-        }
-    
-        const createcard = await database.CardDetail.create(data).then(res => {
-          console.log("create res", res);
-        }) .catch(err => console.error(err))
-        .then(() => process.exit());
-        console.log("created");
-        if(createcard){
-          return res.status(200).send({
-            card: card,
-            message: 'Card added successfully',
-            status: 200
-          });
-        }else{
-          return res.status(401).send({
-            message: 'Something went wrong, please try again later',
-            status: 401
-          });
-        }
-      }
-      
-    } catch (error) {
-      return res.status(401).send({
-        message: error,
-        status: 401
-      });
-    }
-  }
+  try {
+    const id = req.coachId;
 
-  module.exports = { getCardDetails, addCard };
+    const card = await database.CardDetail.findOne({ where: { coach_id: id } });
+    console.log("card details", card)
+    return res.status(401).send({
+      card: card,
+      status: 401
+    });
+  } catch (error) {
+    return res.status(401).send({
+      message: error,
+      status: 401
+    });
+  }
+}
+
+const addCard = async (req, res) => {
+  const { coachId, card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country } = req.body;
+  try {
+    const card = await database.CardDetail.findOne({ where: { coach_id: coachId } });
+    console.log("card", card);
+
+    if (card) {
+      console.log("update")
+      const data = {
+        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: coachId
+      }
+      const update_profile = await database.CardDetail.update(data, { where: { coach_id: coachId } });
+      if (update_profile) {
+        return res.status(200).send({
+          message: 'Card updated successfully',
+          status: 200
+        });
+      } else {
+        return res.status(401).send({
+          message: 'Something went wrong, please try again later',
+          status: 401
+        });
+      }
+    } else {
+      console.log("create")
+      const data = {
+        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: coachId
+      }
+      const createcard = await database.CardDetail.create(data);
+      console.log("after update");
+
+      if (createcard) {
+        return res.status(200).send({
+          message: 'Card added successfully',
+          status: 200
+        });
+      } else {
+        return res.status(401).send({
+          message: 'Something went wrong, please try again later',
+          status: 401
+        });
+      }
+    }
+  } catch (error) {
+    return res.status(401).send({
+      message: error,
+      status: 401
+    });
+  }
+}
+
+module.exports = { getCardDetails, addCard };

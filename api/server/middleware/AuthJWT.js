@@ -19,6 +19,7 @@ const verifyToken = async (req, res, next) => {
                 message: "Unauthorized!"
             });
         }
+        console.log("decoded", decoded);
         req.coachId = decoded.id;
         console.log("decoded id", req.coachId);
         next();

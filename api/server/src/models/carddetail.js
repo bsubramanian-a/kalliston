@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.STRING
     },
-    user_id: {
+    coach_id: {
       allowNull: true,
       type: DataTypes.INTEGER
     },

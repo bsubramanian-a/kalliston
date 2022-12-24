@@ -42,6 +42,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
+      coach_id: {
+        type: Sequelize.INTEGER,
+        allowNull:false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
