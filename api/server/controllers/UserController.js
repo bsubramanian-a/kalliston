@@ -36,9 +36,9 @@ const createCoach = async (req, res) => {
       console.log(token);
 
       const mailOptions = {
-        from: 'crtvecode@gmail.com',
+        from: 'noreply.kalliston@gmail.com',
         to: email,
-        subject: 'Login Credentials',
+        subject: 'Login Credentials from Kalliston',
         text: `Email : ${email}, Password : ${passwordTOSend}`
       };
 
@@ -84,9 +84,9 @@ const coachLogin = async (req, res) => {
 
         if (update_otp) {
           const mailOptions = {
-            from: 'crtvecode@gmail.com',
+            from: 'noreply.kalliston@gmail.com',
             to: email,
-            subject: 'Security Code to Login',
+            subject: 'Security Code to Login Kalliston',
             text: `Security Code : ${otp_to_login}`
           };
     
@@ -140,9 +140,9 @@ const coachForgetPassword = async (req, res) => {
 
         if (update_otp_forget) {
           const mailOptions = {
-            from: 'crtvecode@gmail.com',
+            from: 'noreply.kalliston@gmail.com',
             to: email,
-            subject: 'Security Code to Forget Password',
+            subject: 'Security Code to Forget Password from Kalliston',
             text: `Security Code : ${otp_to_forget}`
           };
     
@@ -243,9 +243,9 @@ const checkOTPForget = async (req, res) => {
           );
           if (password_update) {
             const mailOptions = {
-              from: 'crtvecode@gmail.com',
+              from: 'noreply.kalliston@gmail.com',
               to: email,
-              subject: 'Your New Password',
+              subject: 'Your New Password To Login Kalliston',
               text: `Password : ${passwordTOSend}`
             };
             transporter.sendMail(mailOptions, function(error, info){
@@ -301,7 +301,7 @@ const coachChangePassword = async (req, res) => {
         );
         if (password_update) {
           const mailOptions = {
-            from: 'crtvecode@gmail.com',
+            from: 'noreply.kalliston@gmail.com',
             to: email,
             subject: 'Your New Password Updated Successfully',
             text: `Your new Password : ${newpassword}`
