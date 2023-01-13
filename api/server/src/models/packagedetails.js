@@ -1,23 +1,47 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class PackageDetails extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+  const PackageDetails = sequelize.define('PackageDetails', {    
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    currency: {
+      allowNull: false,
+      type: DataTypes.ENUM,
+      values: ['usd', 'gbp', 'euro'],
+    },
+    amount: {
+      allowNull: false,
+      type: DataTypes.INTEGER
+    },
+    long_description: {
+      allowNull: true,
+      type: DataTypes.TEXT
+    },
+    access_link: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    program_type: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    coach_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    package_type: {
+      type: DataTypes.ENUM,
+      values: ['basic', 'premium', 'elite'],
+      defaultValue:'basic'
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
-  }
-  PackageDetails.init({
-    title: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'PackageDetails',
   });
   return PackageDetails;
 };

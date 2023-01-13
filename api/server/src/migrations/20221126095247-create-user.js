@@ -52,6 +52,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.BOOLEAN
       },
+      category: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       client_request_notification: {
         allowNull: true,
         type: Sequelize.BOOLEAN
@@ -157,6 +161,11 @@ module.exports = {
       long_description: {
         allowNull: true,
         type: Sequelize.BLOB
+      },
+      package_status: {
+        type: Sequelize.ENUM,
+        values: ['draft', 'published'],
+        defaultValue:'draft'
       },
       createdAt: {
         allowNull: false,

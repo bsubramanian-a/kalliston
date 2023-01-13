@@ -107,6 +107,10 @@ module.exports = (sequelize, DataTypes) => {
       values: ['beginner','intermediate','advanced'],
       defaultValue:'beginner'
     },
+    category: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
     latitude: {
       allowNull: true,
       type: DataTypes.REAL
@@ -150,6 +154,11 @@ module.exports = (sequelize, DataTypes) => {
     long_description: {
       allowNull: true,
       type: DataTypes.BLOB
+    },
+    package_status: {
+      type: DataTypes.ENUM,
+      values: ['draft', 'published'],
+      defaultValue:'draft'
     },
     createdAt: {
       allowNull: false,

@@ -13,30 +13,35 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      short_description: {
-        allowNull: true,
-        type: Sequelize.BLOB
+      currency: {
+        allowNull: false,
+        type: Sequelize.ENUM,
+        values: ['usd', 'gbp', 'euro'],
+      },
+      amount: {
+        allowNull: false,
+        type: Sequelize.INTEGER
       },
       long_description: {
         allowNull: true,
-        type: Sequelize.BLOB
+        type: Sequelize.TEXT
       },
       access_link: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       program_type: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
-      offer_type: {
+      coach_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      type: {
+      package_type: {
         type: Sequelize.ENUM,
-        values: ['client', 'coach', 'admin'],
-        defaultValue:'client'
+        values: ['basic', 'premium', 'elite'],
+        defaultValue:'basic'
       },
       createdAt: {
         allowNull: false,

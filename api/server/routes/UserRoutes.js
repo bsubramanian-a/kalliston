@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require('multer');
-const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic } = require('../controllers/UserController');
+const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach } = require('../controllers/UserController');
 const { checkCoachAlreadyExist } = require('../middleware/UserAuth');
 const { verifyToken } = require('../middleware/AuthJWT');
 
@@ -38,7 +38,8 @@ const upload = multer({
 router.get('/',getAllUsers);
 router.post('/create-coach',[checkCoachAlreadyExist],createCoach);
 router.post('/coach-login',coachLogin);
-router.post('/coach-otp',checkOTP);
+router.get('/coach-login',getCoach);
+router.get('/get-coach/:id',getCoach);
 router.post('/coach-forget',coachForgetPassword);
 router.post('/coach-otp-forget',checkOTPForget);
 router.post('/coach-change-password',[verifyToken],coachChangePassword)

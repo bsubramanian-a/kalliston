@@ -15,6 +15,27 @@ const transporter = nodemailer.createTransport({
 
 const util = new Util();
 
+const getCoach = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (id) {
+      const coach =  await database.User.findOne({where: {id}});
+      return res.status(200).send({
+          data: coach,
+          status: 200,
+      });
+    } else {
+        return res.status(401).send("no coach");
+    }
+  } catch (error) {
+    //console.log(error)
+    return res.status(409).send({
+      status: error 
+    });
+  }
+}
+
 const createCoach = async (req, res) => {
   try {
     const { email } = req.body;
@@ -177,8 +198,10 @@ const coachForgetPassword = async (req, res) => {
 
 const checkOTP = async (req, res) => {  
   try {
-    const { email, otp } = req.body;
+    const { email, otp } = req.body.data;
+    // console.log("email", email, otp)
     const coach = await database.User.findOne({where: {email}});
+    console.log("coach", coach);
     if (coach) {
       if (otp == coach.otp_to_login) {
 
@@ -204,23 +227,27 @@ const checkOTP = async (req, res) => {
           //return res.status(200).send("success");
         } else {
           return res.status(401).send({
-            status: "Login OTP error." 
+            message: "Login OTP error.",
+            status: 401
           });
         }
       } else {
         return res.status(401).send({
-          status: "Login OTP is not valid." 
+          message: "Login OTP is not valid.",
+          status: 401
         });
       }
     } else {
       return res.status(401).send({
-        status: "Email does not exist." 
+        message: "Email does not exist.",
+        status: 401
       });
     }
   } catch (error) {
     console.log(error);
     return res.status(401).send({
-      status: "some error" 
+      message: "some error.",
+      status: 401
     });
   }
 }
@@ -514,7 +541,7 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic };
+module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach };
 
 
 
