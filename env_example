@@ -25,3 +25,4 @@ NODE_ENV=development
 DATABASE_URL=postgres://jekrmdll:33u7GM5pRCwkXLPXs3_XoyXsd1XlgsVD@heffalump.db.elephantsql.com/jekrmdll
 
 EMAIL_USER=
+EMAIL_PASSWORD=
