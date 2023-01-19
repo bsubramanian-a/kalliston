@@ -4,42 +4,39 @@ const bcrypt = require('bcrypt');
 const database = require('../src/models');
 const nodemailer = require("nodemailer");
 const jwt = require('jsonwebtoken');
+const { SEND_MAIL_CONFIG } = require('../utils/imap')
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+const transporter = nodemailer.createTransport(SEND_MAIL_CONFIG);
 
 const util = new Util();
 
 const getCoach = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (id) {
-      const coach =  await database.User.findOne({where: {id}});
+      const coach = await database.User.findOne({ where: { id } });
       return res.status(200).send({
-          data: coach,
-          status: 200,
+        data: coach,
+        status: 200,
       });
     } else {
-        return res.status(401).send("no coach");
+      return res.status(401).send("no coach");
     }
   } catch (error) {
     //console.log(error)
     return res.status(409).send({
-      status: error 
+      status: error
     });
   }
 }
 
 const createCoach = async (req, res) => {
+
+
   try {
     const { email } = req.body;
-    const passwordTOSend = Math.random().toString(36).slice(2,7);
+    const passwordTOSend = Math.random().toString(36).slice(2, 7);
 
     const data = {
       email,
@@ -49,39 +46,51 @@ const createCoach = async (req, res) => {
 
     const newCoach = await database.User.create(data);
     if (newCoach) {
-      let token = jwt.sign({id: newCoach.id}, process.env.SECRET_KEY, {
+      let token = jwt.sign({ id: newCoach.id }, process.env.SECRET_KEY, {
         expiresIn: 1 * 24 * 60 * 60 * 1000,
       });
       res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
       console.log("newCoach", JSON.stringify(newCoach, null, 2));
       console.log(token);
 
-      const mailOptions = {
-        from: 'noreply.kalliston@gmail.com',
+      const time = new Date().toString();
+      let info = await transporter.sendMail({
+        from: SEND_MAIL_CONFIG.auth.user,
         to: email,
         subject: 'Login Credentials from Kalliston',
-        text: `Email : ${email}, Password : ${passwordTOSend}`
-      };
-
-      transporter.sendMail(mailOptions, function(error, info){
+        html: `
+        <div
+          class="container"
+          style="max-width: 90%; margin: auto; padding-top: 20px"
+        >
+          <h2>Login Credentials :</h2>
+          <p>Email : ${email}</p>
+          <p>Password : ${passwordTOSend}</p>
+          <p>sent at ${time}</p>
+        </div>
+      `,
+      }, function (error, info) {
         if (error) {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
           return res.status(201).send({
-            status: "success" 
+            status: "success"
           });
         }
       });
+      console.log(`MAIL INFO: ${info}`);
+      console.log(`MAIL SENT AT: ${time}`);
+
     } else {
       return res.status(409).send({
-        status: "error" 
+        status: "error"
       });
     }
   } catch (error) {
     //console.log(error)
     return res.status(409).send({
-      status: "error" 
+      status: "error"
     });
   }
 };
@@ -89,118 +98,140 @@ const createCoach = async (req, res) => {
 const coachLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const coach = await database.User.findOne({where: {email}});
+    const coach = await database.User.findOne({ where: { email } });
 
     if (coach) {
-      const isPasswordSame = await bcrypt.compareSync(password, coach.password);      
-      if (isPasswordSame) {        
+      const isPasswordSame = await bcrypt.compareSync(password, coach.password);
+      if (isPasswordSame) {
 
         //generate otp
         const otp_to_login = Math.floor(100000 + Math.random() * 900000);
-        
+
         const update_otp = await database.User.update(
-          {otp_to_login},
-          {where:{id:coach.id}}
+          { otp_to_login },
+          { where: { id: coach.id } }
         );
 
         if (update_otp) {
-          const mailOptions = {
-            from: 'noreply.kalliston@gmail.com',
+          const time = new Date().toString();
+          let info = await transporter.sendMail({
+            from: SEND_MAIL_CONFIG.auth.user,
             to: email,
             subject: 'Security Code to Login Kalliston',
-            text: `Security Code : ${otp_to_login}`
-          };
-    
-          transporter.sendMail(mailOptions, function(error, info){
+            html: `
+            <div
+              class="container"
+              style="max-width: 90%; margin: auto; padding-top: 20px"
+            >
+              <h2>Your Security Code to do the login :</h2>
+              <p>Security Code : ${otp_to_login}</p>
+              <p>sent at ${time}</p>
+            </div>
+          `,
+          }, function (error, info) {
             if (error) {
               console.log(error);
             } else {
               console.log('Email sent: ' + info.response);
               return res.status(201).send({
-                status: "success" 
+                status: "success"
               });
               //return res.status(201).send(token);
               // do something useful
             }
           });
+          console.log(`MAIL INFO: ${info}`);
+          console.log(`MAIL SENT AT: ${time}`);
         } else {
           return res.status(401).send({
-            status: "OTP error" 
+            status: "OTP error"
           });
         }
       } else {
         return res.status(401).send({
-          status: "Password not correct" 
+          status: "Password not correct"
         });
       }
     } else {
       return res.status(401).send({
-        status: "Email does not exist." 
+        status: "Email does not exist."
       });
     }
 
   } catch (error) {
     console.log(error)
     return res.status(401).send({
-      status: "error" 
+      status: "error"
     });
   }
 };
-const coachForgetPassword = async (req, res) => {  
+const coachForgetPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const coach = await database.User.findOne({where: {email}});
+    const coach = await database.User.findOne({ where: { email } });
     console.log("coach", coach);
     if (coach) {
       const otp_to_forget = Math.floor(100000 + Math.random() * 900000);
-        
-        const update_otp_forget = await database.User.update(
-          {otp_to_forget},
-          {where:{id:coach.id}}
-        );
 
-        if (update_otp_forget) {
-          const mailOptions = {
-            from: 'noreply.kalliston@gmail.com',
-            to: email,
-            subject: 'Security Code to Forget Password from Kalliston',
-            text: `Security Code : ${otp_to_forget}`
-          };
-    
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-              return res.status(201).send({
-                status: "success" 
-              });
-              // do something useful
-            }
-          });
-        } else {
-          return res.status(401).send({
-            status: "OTP error" 
-          });
-        }
+      const update_otp_forget = await database.User.update(
+        { otp_to_forget },
+        { where: { id: coach.id } }
+      );
+
+      if (update_otp_forget) {
+
+        const time = new Date().toString();
+        let info = await transporter.sendMail({
+          from: SEND_MAIL_CONFIG.auth.user,
+          to: email,
+          subject: 'Security Code to Forget Password from Kalliston',
+          html: `
+            <div
+              class="container"
+              style="max-width: 90%; margin: auto; padding-top: 20px"
+            >
+              <h2>Your Security Code for forget password :</h2>
+              <p>Security Code : ${otp_to_forget}</p>
+              <p>sent at ${time}</p>
+            </div>
+          `,
+        }, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+            return res.status(201).send({
+              status: "success"
+            });
+            //return res.status(201).send(token);
+            // do something useful
+          }
+        });
+        console.log(`MAIL INFO: ${info}`);
+        console.log(`MAIL SENT AT: ${time}`);
+      } else {
+        return res.status(401).send({
+          status: "OTP error"
+        });
+      }
     } else {
       return res.status(401).send({
-        status: "Email does not exist." 
+        status: "Email does not exist."
       });
     }
   } catch (error) {
     console.log(error)
     return res.status(401).send({
-      status: "error" 
+      status: "error"
     });
   }
 }
 
-const checkOTP = async (req, res) => {  
+const checkOTP = async (req, res) => {
   try {
     const { email, otp } = req.body.data;
     // console.log("email", email, otp)
-    const coach = await database.User.findOne({where: {email}});
+    const coach = await database.User.findOne({ where: { email } });
     console.log("coach", coach);
     if (coach) {
       if (otp == coach.otp_to_login) {
@@ -213,16 +244,16 @@ const checkOTP = async (req, res) => {
         console.log(token);
 
         const update_otp = await database.User.update(
-          {otp_to_login: null},
-          {where:{id:coach.id}}
+          { otp_to_login: null },
+          { where: { id: coach.id } }
         );
         if (update_otp) {
           const url = req.get('host');
-          if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+          if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
           return res.status(201).send({
             status: "success",
             coach,
-            token 
+            token
           });
           //return res.status(200).send("success");
         } else {
@@ -255,163 +286,188 @@ const checkOTP = async (req, res) => {
 const checkOTPForget = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const coach = await database.User.findOne({where: {email}});
+    const coach = await database.User.findOne({ where: { email } });
     if (coach) {
       if (otp == coach.otp_to_forget) {
         const update_otp_forget = await database.User.update(
-          {otp_to_forget: null},
-          {where:{id:coach.id}}
+          { otp_to_forget: null },
+          { where: { id: coach.id } }
         );
         if (update_otp_forget) {
-          const passwordTOSend = Math.random().toString(36).slice(2,7);
+          const passwordTOSend = Math.random().toString(36).slice(2, 7);
           const password_update = await database.User.update(
-            {password: await bcrypt.hashSync(passwordTOSend, 10)},
-            {where:{id:coach.id}}
+            { password: await bcrypt.hashSync(passwordTOSend, 10) },
+            { where: { id: coach.id } }
           );
           if (password_update) {
-            const mailOptions = {
-              from: 'noreply.kalliston@gmail.com',
+
+            const time = new Date().toString();
+            let info = await transporter.sendMail({
+              from: SEND_MAIL_CONFIG.auth.user,
               to: email,
               subject: 'Your New Password To Login Kalliston',
-              text: `Password : ${passwordTOSend}`
-            };
-            transporter.sendMail(mailOptions, function(error, info){
+              html: `
+            <div
+              class="container"
+              style="max-width: 90%; margin: auto; padding-top: 20px"
+            >
+              <h2>Your New Password To Login Kalliston</h2>
+              <p>Password : ${passwordTOSend}</p>
+              <p>sent at ${time}</p>
+            </div>
+          `,
+            }, function (error, info) {
               if (error) {
                 console.log(error);
               } else {
                 console.log('Email sent: ' + info.response);
                 return res.status(200).send({
-                  status: "success" 
+                  status: "success"
                 });
               }
             });
+            console.log(`MAIL INFO: ${info}`);
+            console.log(`MAIL SENT AT: ${time}`);
+
           } else {
             return res.status(401).send({
-              status: "Password update error." 
+              status: "Password update error."
             });
           }
         } else {
           return res.status(401).send({
-            status: "Forget OTP error." 
+            status: "Forget OTP error."
           });
         }
       } else {
         return res.status(401).send({
-          status: "Forget OTP is not valid." 
+          status: "Forget OTP is not valid."
         });
       }
     } else {
       return res.status(401).send({
-        status: "Email does not exist." 
+        status: "Email does not exist."
       });
     }
   } catch (error) {
     console.log(error);
     return res.status(401).send({
-      status: "some error" 
+      status: "some error"
     });
   }
 }
 
 const coachChangePassword = async (req, res) => {
   try {
-    const { email, currentpassword,newpassword } = req.body;
-    const coach = await database.User.findOne({where: {email}});
+    const { email, currentpassword, newpassword } = req.body;
+    const coach = await database.User.findOne({ where: { email } });
     if (coach) {
-      console.log("oldpassword",currentpassword);
-      console.log("coach.password",coach.password);
-      const isPasswordSame = await bcrypt.compareSync(currentpassword, coach.password);      
+      console.log("oldpassword", currentpassword);
+      console.log("coach.password", coach.password);
+      const isPasswordSame = await bcrypt.compareSync(currentpassword, coach.password);
       if (isPasswordSame) {
         const password_update = await database.User.update(
-          {password: await bcrypt.hashSync(newpassword, 10)},
-          {where:{id:coach.id}}
+          { password: await bcrypt.hashSync(newpassword, 10) },
+          { where: { id: coach.id } }
         );
         if (password_update) {
-          const mailOptions = {
-            from: 'noreply.kalliston@gmail.com',
-            to: email,
-            subject: 'Your New Password Updated Successfully',
-            text: `Your new Password : ${newpassword}`
-          };
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-              return res.status(200).send({
-                message: "Password changed successfully",
-                status: 200 
-              });
-            }
-          });
+
+          const time = new Date().toString();
+            let info = await transporter.sendMail({
+              from: SEND_MAIL_CONFIG.auth.user,
+              to: email,
+              subject: 'Your New Password Updated Successfully',
+              html: `
+            <div
+              class="container"
+              style="max-width: 90%; margin: auto; padding-top: 20px"
+            >
+              <h2>Your New Password Updated Successfully</h2>
+              <p>Your new Password : ${newpassword}</p>
+              <p>sent at ${time}</p>
+            </div>
+          `,
+            }, function (error, info) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log('Email sent: ' + info.response);
+                return res.status(200).send({
+                  message: "Password changed successfully",
+                  status: 200
+                });
+              }
+            });
+            console.log(`MAIL INFO: ${info}`);
+            console.log(`MAIL SENT AT: ${time}`);
         } else {
           return res.status(401).send({
             message: "New Password update error.",
             status: 401
-          }); 
+          });
         }
       } else {
         return res.status(401).send({
           status: 401,
-          message: "Old password is not correct." 
-        }); 
+          message: "Old password is not correct."
+        });
       }
     } else {
       return res.status(401).send({
         status: 401,
-        message: "Email does not exist." 
+        message: "Email does not exist."
       });
     }
   } catch (error) {
     console.log(error)
     return res.status(401).send({
       status: 401,
-      message: "error" 
+      message: "error"
     });
   }
 }
 
-const coachUpdateProfilePic = async(req, res) => {
+const coachUpdateProfilePic = async (req, res) => {
   console.log("coachUpdateProfilePic", req.file.filename);
   try {
-    const id  = req.coachId;
-    const coach = await database.User.findOne({where: {id}});
-    if(coach){
-      if(req.file){
+    const id = req.coachId;
+    const coach = await database.User.findOne({ where: { id } });
+    if (coach) {
+      if (req.file) {
         const update_profile = await database.User.update(
-          {avatar : req.file.filename},
-          {where: {id}}
+          { avatar: req.file.filename },
+          { where: { id } }
         );
         if (update_profile) {
-          const coach = await database.User.findOne({where: {id}});
+          const coach = await database.User.findOne({ where: { id } });
           const url = req.get('host');
-          console.log("url",url);
-          if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+          console.log("url", url);
+          if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
           return res.status(200).send({
             message: "Profile picture updated successfully",
             coach: coach,
             status: 200
           });
-        }else{
+        } else {
           return res.status(401).send({
             message: "Something went wrong, please try again later",
             status: 401
           });
         }
-       
-      }else{
+
+      } else {
         return res.status(401).send({
           message: "something went wrong, please try again later",
           status: 401
         });
       }
-    }else {
+    } else {
       return res.status(401).send({
         message: "User does not exist.",
         status: 401
       });
     }
-    
+
   } catch (error) {
     console.log(error)
     return res.status(401).send({
@@ -423,14 +479,14 @@ const coachUpdateProfilePic = async(req, res) => {
 
 const coachUpdateProfile = async (req, res) => {
   try {
-    const id  = req.coachId;
+    const id = req.coachId;
 
-    const { 
-      email, 
-      gender, 
-      dob,  
-      firstname, 
-      lastname, 
+    const {
+      email,
+      gender,
+      dob,
+      firstname,
+      lastname,
       email_notification,
       client_request_notification,
       message_from_client,
@@ -460,51 +516,52 @@ const coachUpdateProfile = async (req, res) => {
       long_description,
       otp_required
     } = req.body;
-    const coach = await database.User.findOne({where: {id}});
+    const coach = await database.User.findOne({ where: { id } });
 
     if (coach) {
       const update_profile = await database.User.update(
-        { email : email ?? undefined, 
-          gender : gender ?? undefined, 
-          dob : dob ?? undefined,
-          firstname : firstname ?? undefined, 
-          lastname : lastname ?? undefined, 
-          email_notification : email_notification ?? undefined,
-          client_request_notification : client_request_notification ?? undefined,
-          message_from_client : message_from_client ?? undefined,
-          two_factor_auth : two_factor_auth ?? undefined,
-          sync_google : sync_google ?? undefined,
-          cal : cal ?? undefined,
-          bio : bio ?? undefined,
+        {
+          email: email ?? undefined,
+          gender: gender ?? undefined,
+          dob: dob ?? undefined,
+          firstname: firstname ?? undefined,
+          lastname: lastname ?? undefined,
+          email_notification: email_notification ?? undefined,
+          client_request_notification: client_request_notification ?? undefined,
+          message_from_client: message_from_client ?? undefined,
+          two_factor_auth: two_factor_auth ?? undefined,
+          sync_google: sync_google ?? undefined,
+          cal: cal ?? undefined,
+          bio: bio ?? undefined,
           otp_required: otp_required ?? undefined,
-          customized_link : customized_link ?? undefined,
-          website_link : website_link ?? undefined,
-          instagram_link : instagram_link ?? undefined,
-          facebook_link : facebook_link ?? undefined,
-          tiktok_link : tiktok_link ?? undefined,
-          youtube_link : youtube_link ?? undefined,
-          cover_image : cover_image ?? undefined,
-          user_type : user_type ?? undefined,
-          your_goal : your_goal ?? undefined,
-          current_fitness_level : current_fitness_level ?? undefined,
-          latitude : latitude ?? undefined,
-          longitude : longitude ?? undefined,
-          billing_address1 : billing_address1 ?? undefined,
-          billing_address2 : billing_address2 ?? undefined,
-          city : city ?? undefined,
-          country : country ?? undefined,
-          experience : experience ?? undefined,
-          certifications : certifications ?? undefined,
-          areas_of_interest : areas_of_interest ?? undefined,
-          long_description : long_description ?? undefined
+          customized_link: customized_link ?? undefined,
+          website_link: website_link ?? undefined,
+          instagram_link: instagram_link ?? undefined,
+          facebook_link: facebook_link ?? undefined,
+          tiktok_link: tiktok_link ?? undefined,
+          youtube_link: youtube_link ?? undefined,
+          cover_image: cover_image ?? undefined,
+          user_type: user_type ?? undefined,
+          your_goal: your_goal ?? undefined,
+          current_fitness_level: current_fitness_level ?? undefined,
+          latitude: latitude ?? undefined,
+          longitude: longitude ?? undefined,
+          billing_address1: billing_address1 ?? undefined,
+          billing_address2: billing_address2 ?? undefined,
+          city: city ?? undefined,
+          country: country ?? undefined,
+          experience: experience ?? undefined,
+          certifications: certifications ?? undefined,
+          areas_of_interest: areas_of_interest ?? undefined,
+          long_description: long_description ?? undefined
         },
-        {where:{id:coach.id}}
+        { where: { id: coach.id } }
       );
-      console.log("update_profile",update_profile)
+      console.log("update_profile", update_profile)
       if (update_profile) {
-        const coach = await database.User.findOne({where: {id}});
+        const coach = await database.User.findOne({ where: { id } });
         const url = req.get('host');
-        if(coach.avatar) coach.avatar = 'http://' +url + '/coach/images/' + coach.avatar;
+        if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
         return res.status(200).send({
           message: "profile updated",
           coach,

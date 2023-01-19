@@ -1,18 +1,4 @@
-const Util = require('../utils/Utils');
-const bcrypt = require('bcrypt');
 const database = require('../src/models');
-const nodemailer = require("nodemailer");
-const jwt = require('jsonwebtoken');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
-
-const util = new Util();
 
 const getCardDetails = async (req, res) => {
   try {
