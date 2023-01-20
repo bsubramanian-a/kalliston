@@ -457,7 +457,7 @@ const coachUpdateProfilePic = async (req, res) => {
 
       } else {
         return res.status(401).send({
-          message: "something went wrong, please try again later",
+          message: "Please select an image to upload",
           status: 401
         });
       }

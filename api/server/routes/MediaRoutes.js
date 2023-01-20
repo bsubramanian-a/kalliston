@@ -1,9 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const { getCardDetails, addCard} = require('../controllers/MediaController');
+const { coachUpdateCoverImage } = require('../controllers/MediaController');
 const { verifyToken } = require('../middleware/AuthJWT');
+const multer = require('multer');
 
-router.get('/get-card-details',[verifyToken],getCardDetails);
-router.post('/add-card',[verifyToken],addCard);
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // console.log("dest", file);
+        cb(null, "public/coach/images");
+    },
+    filename: (req, file, cb) => {
+        // console.log("filename", file);
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `file-${file.fieldname}-${Date.now()}.${ext}`);
+    },
+});
+
+// Multer Filter
+const multerFilter = (req, file, cb) => {
+    // console.log("multerFilter", file);
+    if (file.mimetype.split("/")[1] === "jpg" || file.mimetype.split("/")[1] === "jpeg" || file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "webp" || file.mimetype.split("/")[1] === "gif") {
+    cb(null, true);
+    } else {
+    cb(new Error("Not an image File!!"), false);
+    }
+};
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+    limits: {
+        fileSize: 10000000
+    },
+});
+
+router.post('/update-cover-image',[verifyToken, upload.single("image")], coachUpdateCoverImage);
 
 module.exports = router;

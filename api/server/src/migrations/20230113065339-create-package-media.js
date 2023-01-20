@@ -18,6 +18,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      type: {
+        type: Sequelize.ENUM,
+        values: ['cover', 'media'],
+        defaultValue:'media'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Media = sequelize.define('Media', {
+  const Medias = sequelize.define('Medias', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -8,12 +8,17 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: {
       allowNull: false,
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     coach_id: {
       allowNull: false,
-      type: Sequelize.STRING
+      type: DataTypes.INTEGER
+    },
+    type: {
+      type: DataTypes.ENUM,
+      values: ['cover','media'],
+      defaultValue:'media',
     },
   });
-  return Media;
+  return Medias;
 }; 

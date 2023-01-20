@@ -1,73 +1,38 @@
 const database = require('../src/models');
 
-const getCardDetails = async (req, res) => {
-  try {
-    const id = req.coachId;
+const coachUpdateCoverImage = async (req, res) => {
+  // console.log("req----------------", req.body.type);
+  if (req.file) {
+    try {
+      const id  = req.coachId;
+  
+        const data = {
+          image: req.file.filename, coach_id: id, type: req.body.type
+        }
+        // console.log("data.........", data)
 
-    const card = await database.CardDetail.findOne({ where: { coach_id: id } });
-    console.log("card details", card)
-    return res.status(200).send({
-      card: card,
-      status: 200
-    });
-  } catch (error) {
-    return res.status(401).send({
-      message: error,
-      status: 401
-    });
-  }
-}
+        const addMedia = await database.Medias.create(data);
 
-const addCard = async (req, res) => {
-  const { card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country } = req.body;
-  try {
-    const id  = req.coachId;
-    const card = await database.CardDetail.findOne({ where: { coach_id: id } });
-    console.log("card", card);
-
-    if (card) {
-      console.log("update")
-      const data = {
-        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: id
-      }
-      const update_profile = await database.CardDetail.update(data, { where: { coach_id: id } });
-      if (update_profile) {
-        return res.status(200).send({
-          message: 'Card updated successfully',
-          status: 200
-        });
-      } else {
-        return res.status(401).send({
-          message: 'Something went wrong, please try again later',
-          status: 401
-        });
-      }
-    } else {
-      console.log("create")
-      const data = {
-        card_number, card_holder_name, expiry_date, cvv, billing_address1, billing_address2, city, country, coach_id: id
-      }
-      const createcard = await database.CardDetail.create(data);
-      console.log("after update");
-
-      if (createcard) {
-        return res.status(200).send({
-          message: 'Card added successfully',
-          status: 200
-        });
-      } else {
-        return res.status(401).send({
-          message: 'Something went wrong, please try again later',
-          status: 401
-        });
-      }
+        if(addMedia){
+          return res.status(200).send({
+            message: "Success",
+            status: 200
+          });
+        }
+       
+        // console.log("after addMedia", addMedia);
+    } catch (error) {
+      return res.status(401).send({
+        message: error,
+        status: 401
+      });
     }
-  } catch (error) {
+  } else {
     return res.status(401).send({
-      message: error,
+      message: "Please select an image to upload",
       status: 401
     });
   }
 }
 
-module.exports = { getCardDetails, addCard };
+module.exports = { coachUpdateCoverImage };
