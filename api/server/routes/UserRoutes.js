@@ -4,7 +4,7 @@ const multer = require('multer');
 const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach, coachUpdateCoverImage, coachDeleteCoverImage } = require('../controllers/UserController');
 const { checkCoachAlreadyExist } = require('../middleware/UserAuth');
 const { verifyToken } = require('../middleware/AuthJWT');
-import fs from 'fs';
+const fs = require('fs');
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {

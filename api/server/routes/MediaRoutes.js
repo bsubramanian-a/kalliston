@@ -3,7 +3,7 @@ const router = express.Router();
 const { coachUpdateMediaImage, coachDeleteMediaImage, getCoachMedias } = require('../controllers/MediaController');
 const { verifyToken } = require('../middleware/AuthJWT');
 const multer = require('multer');
-import fs from 'fs';
+const fs = require('fs');
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
