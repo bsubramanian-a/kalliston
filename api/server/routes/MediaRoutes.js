@@ -3,10 +3,13 @@ const router = express.Router();
 const { coachUpdateMediaImage, coachDeleteMediaImage, getCoachMedias } = require('../controllers/MediaController');
 const { verifyToken } = require('../middleware/AuthJWT');
 const multer = require('multer');
+import fs from 'fs';
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         // console.log("dest", file);
+        const path = `public/coach/images`
+        fs.mkdirSync(path, { recursive: true })
         cb(null, "public/coach/images");
     },
     filename: (req, file, cb) => {
