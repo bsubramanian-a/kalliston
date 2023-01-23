@@ -11,9 +11,7 @@ const app = express();
 var publicDir = require('path').join(__dirname,'/public'); 
 app.use(express.static(publicDir)); 
 
-app.use(cors({
-    origin: '*'
-}));
+app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
