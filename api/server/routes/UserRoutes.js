@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require('multer');
-const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach } = require('../controllers/UserController');
+const { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach, coachUpdateCoverImage, coachDeleteCoverImage } = require('../controllers/UserController');
 const { checkCoachAlreadyExist } = require('../middleware/UserAuth');
 const { verifyToken } = require('../middleware/AuthJWT');
 
@@ -46,5 +46,7 @@ router.post('/coach-otp-forget',checkOTPForget);
 router.post('/coach-change-password',[verifyToken],coachChangePassword)
 router.put('/coach-update-profile',[verifyToken],coachUpdateProfile);
 router.post('/coach-update-profile-pic',[verifyToken, upload.single("image")],coachUpdateProfilePic);
+router.post('/coach-update-cover-image',[verifyToken, upload.single("image")],coachUpdateCoverImage);
+router.delete('/coach-delete-cover-image',[verifyToken], coachDeleteCoverImage);
 
 module.exports = router;

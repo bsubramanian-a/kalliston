@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { coachUpdateCoverImage } = require('../controllers/MediaController');
+const { coachUpdateMediaImage, coachDeleteMediaImage, getCoachMedias } = require('../controllers/MediaController');
 const { verifyToken } = require('../middleware/AuthJWT');
 const multer = require('multer');
 
@@ -20,9 +20,9 @@ const multerStorage = multer.diskStorage({
 const multerFilter = (req, file, cb) => {
     // console.log("multerFilter", file);
     if (file.mimetype.split("/")[1] === "jpg" || file.mimetype.split("/")[1] === "jpeg" || file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "webp" || file.mimetype.split("/")[1] === "gif") {
-    cb(null, true);
+        cb(null, true);
     } else {
-    cb(new Error("Not an image File!!"), false);
+        cb(new Error("Not an image File!!"), false);
     }
 };
 
@@ -34,6 +34,8 @@ const upload = multer({
     },
 });
 
-router.post('/update-cover-image',[verifyToken, upload.single("image")], coachUpdateCoverImage);
+router.get('/get-coach-medias',[verifyToken], getCoachMedias);
+router.post('/update-media-image',[verifyToken, upload.single("image")], coachUpdateMediaImage);
+router.delete('/delete-media-image/:id',[verifyToken], coachDeleteMediaImage);
 
 module.exports = router;

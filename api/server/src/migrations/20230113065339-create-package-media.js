@@ -16,7 +16,7 @@ module.exports = {
       },
       coach_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       type: {
         type: Sequelize.ENUM,

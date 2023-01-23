@@ -16,6 +16,11 @@ const getCoach = async (req, res) => {
 
     if (id) {
       const coach = await database.User.findOne({ where: { id } });
+      const url = req.get('host');
+
+      if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
+      if (coach.cover_image) coach.cover_image = 'http://' + url + '/coach/images/' + coach.cover_image;
+      
       return res.status(200).send({
         data: coach,
         status: 200,
@@ -477,6 +482,42 @@ const coachUpdateProfilePic = async (req, res) => {
   }
 }
 
+const coachUpdateCoverImage = async (req, res) => {
+  // console.log("req----------------", req.body.type);
+  if (req.file) {
+    try {
+      const id  = req.coachId;
+
+      // console.log("data.........", data)
+      const coach = await database.User.findOne({ where: { id } });
+
+      const addMedia = await database.User.update(
+        { cover_image: req.file.filename },
+        { where: { id: id } }
+      );
+      
+      if(addMedia){
+        return res.status(200).send({
+          message: "Success",
+          status: 200
+        });
+      }
+       
+      console.log("after addMedia", addMedia);
+    } catch (error) {
+      return res.status(401).send({
+        message: error,
+        status: 401
+      });
+    }
+  } else {
+    return res.status(401).send({
+      message: "Please select an image to upload",
+      status: 401
+    });
+  }
+}
+
 const coachUpdateProfile = async (req, res) => {
   try {
     const id = req.coachId;
@@ -598,7 +639,42 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach };
+const coachDeleteCoverImage = async (req, res) => {
+  try {
+    const { id } = req.coachId;
+
+    try {
+      const user = await database.User.findOne({ where: { id: Number(id) } });
+
+      if (user) {
+        const deleteCoverImage = await database.User.update(
+          { cover_image: "" },
+          { where: { id: id } }
+        );
+       
+        return res.status(200).send({
+          message: "Cover Image deleted successfully",
+          status: 200
+        });
+      }
+      return res.status(401).send({
+        message: 'Something went wrong please try again later',
+        status: 401
+      });
+    } catch (error) {
+      console.log("delete error.......", error);
+      throw error;
+    }
+    // console.log("after addMedia", addMedia);
+  } catch (error) {
+    return res.status(401).send({
+      message: error,
+      status: 401
+    });
+  }
+}
+
+module.exports = { createCoach, coachLogin, coachForgetPassword, coachUpdateProfile, getAllUsers, checkOTP, checkOTPForget, coachChangePassword, coachUpdateProfilePic, getCoach, coachUpdateCoverImage, coachDeleteCoverImage };
 
 
 
