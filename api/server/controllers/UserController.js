@@ -442,7 +442,7 @@ const coachUpdateProfilePic = async (req, res) => {
       if (req.file) {
         try{
           const update_profile = await database.User.update(
-            { avatar: req.file.filename },
+            { avatar: req.file.filename, package_status: 'draft' },
             { where: { id } }
           );
           if (update_profile) {
@@ -500,7 +500,7 @@ const coachUpdateCoverImage = async (req, res) => {
       const coach = await database.User.findOne({ where: { id } });
 
       const addMedia = await database.User.update(
-        { cover_image: req.file.filename },
+        { cover_image: req.file.filename, package_status: 'draft' },
         { where: { id: id } }
       );
       
@@ -575,7 +575,7 @@ const coachUpdateProfile = async (req, res) => {
         {
           email: email ?? undefined,
           gender: gender ?? undefined,
-          package_status: package_status ?? undefined,
+          package_status: package_status ?? 'draft',
           dob: dob ?? undefined,
           firstname: firstname ?? undefined,
           lastname: lastname ?? undefined,
