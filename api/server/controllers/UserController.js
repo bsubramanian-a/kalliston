@@ -439,27 +439,34 @@ const coachUpdateProfilePic = async (req, res) => {
     const coach = await database.User.findOne({ where: { id } });
     if (coach) {
       if (req.file) {
-        const update_profile = await database.User.update(
-          { avatar: req.file.filename },
-          { where: { id } }
-        );
-        if (update_profile) {
-          const coach = await database.User.findOne({ where: { id } });
-          const url = req.get('host');
-          console.log("url", url);
-          if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
-          return res.status(200).send({
-            message: "Profile picture updated successfully",
-            coach: coach,
-            status: 200
-          });
-        } else {
+        try{
+          const update_profile = await database.User.update(
+            { avatar: req.file.filename },
+            { where: { id } }
+          );
+          if (update_profile) {
+            const coach = await database.User.findOne({ where: { id } });
+            const url = req.get('host');
+            console.log("url", url);
+            if (coach.avatar) coach.avatar = 'http://' + url + '/coach/images/' + coach.avatar;
+            return res.status(200).send({
+              message: "Profile picture updated successfully",
+              coach: coach,
+              status: 200
+            });
+          } else {
+            return res.status(401).send({
+              message: "Something went wrong, please try again later",
+              status: 401
+            });
+          }
+        }catch (error) {
+          console.log(error)
           return res.status(401).send({
-            message: "Something went wrong, please try again later",
-            status: 401
+            status: 401,
+            message: error
           });
         }
-
       } else {
         return res.status(401).send({
           message: "Please select an image to upload",
@@ -521,11 +528,12 @@ const coachUpdateCoverImage = async (req, res) => {
 const coachUpdateProfile = async (req, res) => {
   try {
     const id = req.coachId;
-
     const {
       email,
       gender,
+      package_status,
       dob,
+      category,
       firstname,
       lastname,
       email_notification,
@@ -535,12 +543,12 @@ const coachUpdateProfile = async (req, res) => {
       sync_google,
       cal,
       bio,
-      customized_link,
+      linkedin_link,
       website_link,
       instagram_link,
       facebook_link,
       tiktok_link,
-      youtube_link,
+      twitter_link,
       cover_image,
       user_type,
       your_goal,
@@ -556,14 +564,17 @@ const coachUpdateProfile = async (req, res) => {
       areas_of_interest,
       long_description,
       otp_required
-    } = req.body;
+    } = req?.body?.data || req?.body;
     const coach = await database.User.findOne({ where: { id } });
+
+
 
     if (coach) {
       const update_profile = await database.User.update(
         {
           email: email ?? undefined,
           gender: gender ?? undefined,
+          package_status: package_status ?? undefined,
           dob: dob ?? undefined,
           firstname: firstname ?? undefined,
           lastname: lastname ?? undefined,
@@ -574,13 +585,14 @@ const coachUpdateProfile = async (req, res) => {
           sync_google: sync_google ?? undefined,
           cal: cal ?? undefined,
           bio: bio ?? undefined,
+          category: category ?? undefined,
           otp_required: otp_required ?? undefined,
-          customized_link: customized_link ?? undefined,
+          linkedin_link: linkedin_link ?? undefined,
           website_link: website_link ?? undefined,
           instagram_link: instagram_link ?? undefined,
           facebook_link: facebook_link ?? undefined,
           tiktok_link: tiktok_link ?? undefined,
-          youtube_link: youtube_link ?? undefined,
+          twitter_link: twitter_link ?? undefined,
           cover_image: cover_image ?? undefined,
           user_type: user_type ?? undefined,
           your_goal: your_goal ?? undefined,

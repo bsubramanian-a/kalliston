@@ -63,9 +63,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     bio: {
       allowNull: true,
-      type: DataTypes.BLOB
+      type: DataTypes.TEXT
     },
-    customized_link: {
+    linkedin_link: {
       allowNull: true,
       type: DataTypes.STRING
     },
@@ -85,7 +85,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.STRING
     },
-    youtube_link: {
+    twitter_link: {
       allowNull: true,
       type: DataTypes.STRING
     },

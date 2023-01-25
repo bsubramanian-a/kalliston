@@ -34,7 +34,7 @@ module.exports = {
       },
       avatar: {
         allowNull: true,
-        type: Sequelize.BLOB
+        type: Sequelize.STRING
       },
       firstname: {
         allowNull: true,
@@ -74,9 +74,9 @@ module.exports = {
       },
       bio: {
         allowNull: true,
-        type: Sequelize.BLOB
+        type: Sequelize.TEXT
       },
-      customized_link: {
+      linkedin_link: {
         allowNull: true,
         type: Sequelize.STRING
       },
@@ -96,7 +96,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
-      youtube_link: {
+      twitter_link: {
         allowNull: true,
         type: Sequelize.STRING
       },
