@@ -13,6 +13,7 @@ const util = new Util();
 const getCoach = async (req, res) => {
   try {
     const id = req.coachId;
+    console.log("id", id);
 
     if (id) {
       const coach = await database.User.findOne({ where: { id } });

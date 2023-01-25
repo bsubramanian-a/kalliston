@@ -43,7 +43,7 @@ router.post('/create-coach',[checkCoachAlreadyExist],createCoach);
 router.post('/coach-login',coachLogin);
 router.post('/coach-otp',checkOTP);
 router.get('/coach-login',getCoach);
-router.get('/get-coach/:id',getCoach);
+router.get('/get-coach/:id',[verifyToken],getCoach);
 router.post('/coach-forget',coachForgetPassword);
 router.post('/coach-otp-forget',checkOTPForget);
 router.post('/coach-change-password',[verifyToken],coachChangePassword)
